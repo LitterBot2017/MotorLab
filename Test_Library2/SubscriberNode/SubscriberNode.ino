@@ -1,5 +1,6 @@
 #include <ros.h>
 #include <std_msgs/Int16.h>
+#include "Servo.h"
 
 Servo testServo;
 
