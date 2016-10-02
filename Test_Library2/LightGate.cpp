@@ -9,6 +9,6 @@ LightGate::LightGate(int pin){
 }
 
 int LightGate::getState(){
-	int state=digitalRead(pin);
+	int state=digitalRead(pin_num);
 	return state;
 }
