@@ -5,7 +5,10 @@
 #include "LightGate.h"
 #include "Servo.h"
 
+Servo testServo;
+
 ros::NodeHandle sensorNode;
+
 
 
 std_msgs::Int16 ultraMsg;
@@ -19,12 +22,27 @@ Ultrasonic ultraSensor(A0);
 IRSensor irSensor(A1);
 LightGate lightGateSensor(7);
 
+void ultraCb(const std_msgs::Int16& ultra_msg)
+{
+  int val=ultra_msg.data%180;
+  //lightGateMsg.data=val;
+  //lightGate.publish(&lightGateMsg);
+  testServo.write(val); 
+}
+
+ros::Subscriber <std_msgs::Int16> sub("ir_dist",&ultraCb);
+
+
 void setup() {
   // put your setup code here, to run once:
   sensorNode.initNode();
   sensorNode.advertise(ultraDist);
   sensorNode.advertise(irDist);
   sensorNode.advertise(lightGate);
+
+  testServo.attach(9);
+
+  sensorNode.subscribe(sub);
 }
 
 void loop() {
