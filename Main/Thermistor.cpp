@@ -10,6 +10,6 @@ Thermistor::Thermistor(int pin)
 
 int Thermistor::gettemperature()
 {
-    int thermistorReading = analogRead(thermistorPin);
+    int thermistorReading = analogRead(pinNum);
     return thermistorReading;
 }
