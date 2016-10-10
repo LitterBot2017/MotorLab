@@ -61,7 +61,7 @@ void loop() {
   ArduinoMsg.dc_motor_speed = 0;
   ArduinoMsg.servo_position = 0;
   ArduinoMsg.stepper_motor_position = 0;
-  ArduinoMsg.temperature = 0;
+  ArduinoMsg.temperature = tempSensor.gettemperature();
   ArduinoMsg.light_gate_state = lightGateSensor.getState();
   ArduinoMsg.ultrasonic_distance = ultraSensor.filteredReading();
   ArduinoMsg.ir_distance = irSensor.distanceReading();

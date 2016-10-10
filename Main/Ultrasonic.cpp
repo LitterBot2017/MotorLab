@@ -11,7 +11,6 @@ int reading=0;
 Ultrasonic::Ultrasonic(int pin)
 {
     pinNum=pin;
-    pinMode(pin,INPUT);
 }
 
 int Ultrasonic::filteredReading()

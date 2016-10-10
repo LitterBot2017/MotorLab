@@ -4,7 +4,6 @@
 IRSensor::IRSensor(int pin)
 {
     pinNum=pin;
-    pinMode(pin,INPUT);
 }
 
 int IRSensor::distanceReading()
