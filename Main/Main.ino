@@ -5,6 +5,7 @@
 #include "IRSensor.h"
 #include "LightGate.h"
 #include "Servo.h"
+#include "Thermistor.h"
 
 Servo testServo;
 
@@ -23,13 +24,12 @@ ros::Publisher output_msg("ArduinoMsg",&ArduinoMsg);
 
 Ultrasonic ultraSensor(A0);
 IRSensor irSensor(A1);
+Thermistor tempSensor(A2);
 LightGate lightGateSensor(7);
 
 void ultraCb(const std_msgs::Int16& ultra_msg)
 {
   int val=ultra_msg.data%180;
-  //lightGateMsg.data=val;
-  //lightGate.publish(&lightGateMsg);
   testServo.write(val); 
 }
 
