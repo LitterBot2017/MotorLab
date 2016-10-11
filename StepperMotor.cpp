@@ -1,35 +1,37 @@
 #include "Arduino.h"
+#include "StepperMotor.h"
 
 StepperMotor::StepperMotor(int pin1, int pin2)
 {
     dirPin=pin1;
     pinMode(dirPin,OUTPUT);
-	stepperPin=pin2;
-	pinMode(stepperPin,OUTPUT)
+	  stepPin=pin2;
+	  pinMode(stepPin,OUTPUT);
 	
 }
 
-int StepperMotor::step(bool dir, int steps);
+void StepperMotor::stepDegrees(bool dir, int steps)
 {
  digitalWrite(dirPin,dir);
  delay(50);
  for(int i=0;i<steps;i++){
-   digitalWrite(stepperPin, HIGH);
+   digitalWrite(stepPin, HIGH);
    delayMicroseconds(800);
-   digitalWrite(stepperPin, LOW);
+   digitalWrite(stepPin, LOW);
    delayMicroseconds(800);
 }
+}
 
-int StepperMotor::moveDegrees(int degrees);
+void StepperMotor::moveDegrees(int degreeNumber)
 {
-  if (degrees > 0){
-    userAbs = (degrees);
+  if (degreeNumber > 0){
+    userAbs = (degreeNumber);
     stepNumber = (userAbs * 200/360);
-    step(true,stepNumber);
+    stepDegrees(true,stepNumber);
  }
-  if (degrees < 0){
-    userAbs = (-1*degrees);
+  if (degreeNumber < 0){
+    userAbs = (-1*degreeNumber);
     stepNumber = (userAbs * 200/360);
-    step(false,stepNumber);
+    stepDegrees(false,stepNumber);
   }
 }

@@ -1,19 +1,18 @@
-#ifndef StepperMotor
-#define StepperMotor
+#ifndef StepperMotor_h
+#define StepperMotor_h
 
 #include "Arduino.h"
 
 class StepperMotor
 {
     public:
-	      StepperMotor(int pin1, int pin2);
-          moveDegrees(int degrees);
+	        StepperMotor(int pin1, int pin2);
+     void moveDegrees(int degreeNumber);
     private:
-         step(bool dir, int steps);
+     void stepDegrees(bool dir, int steps);
 		 int dirPin;
 		 int stepPin;
 		 float userAbs;
 		 float stepNumber;
 };
 #endif
-boolean
