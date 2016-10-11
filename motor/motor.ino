@@ -17,10 +17,16 @@ double currentAngle;
 double velocity;
 double setDesiredAngle;
 double desiredAngle;
-double kp = 0.1, ki = 0, kd = 0.05;
 
-// Input = currPosition, output = velocity, setpoint = speed
-PID myPID(&currentAngle, &velocity, &setDesiredAngle, kp, ki, kd, DIRECT);
+int errorNow;
+int errorLast;
+int errorDiff;
+
+int timeNow;
+int timeLast;
+int timeDiff;
+
+double kp = 0.05, ki = 0, kd = 0;
 
 void setup() {
 
@@ -35,10 +41,6 @@ void setup() {
   // Motor Encoder Pin Setup
   pinMode(motorEncoderAPort, INPUT);
   pinMode(motorEncoderBPort, INPUT);
-
-  myPID.SetMode(AUTOMATIC);
-
-  myPID.SetOutputLimits(-255, 255);
 }
 
 void loop() {
@@ -46,21 +48,27 @@ void loop() {
   currentAngle = (myEnc.read() / 2);
 
   if (Serial.available() > 0) {
-    desiredAngle = Serial.read();
+    desiredAngle = Serial.parseInt();
     if (desiredAngle != 0) {
+      Serial.println("desiredAngle = " + String(desiredAngle));
       setDesiredAngle = currentAngle + desiredAngle;
     }
   }
 
-  myPID.Compute();
+  
+  errorNow = desiredAngle - currentAngle;
+  timeNow = millis();
+  timeDiff = timeNow - timeLast;
+  errorDiff = errorNow - errorLast;
 
+  
   turnMotor(velocity);
 }
 
 void turnMotor(int velocity) {
   if (abs(velocity) > 0) {
-    Serial.println("currAng: " + String(currentAngle) + "; desAng: " + String(setDesiredAngle) + "; speed: " + String(((abs(velocity) + 80) % 256)));
-    analogWrite(motorSpeedPort, ((abs(velocity) + 80) % 256));
+    Serial.println("currAng: " + String(currentAngle) + "; desAng: " + String(setDesiredAngle) + "; vel: " + String(velocity) + "; speed: " + String((abs(velocity) + 79)));
+    
     if (velocity < 0) {
       digitalWrite(motorL1Port, HIGH);
       digitalWrite(motorL2Port, LOW);
@@ -68,6 +76,7 @@ void turnMotor(int velocity) {
       digitalWrite(motorL1Port, LOW);
       digitalWrite(motorL2Port, HIGH);
     }
+    analogWrite(motorSpeedPort, (abs(velocity) + 79));
   }
 }
 
