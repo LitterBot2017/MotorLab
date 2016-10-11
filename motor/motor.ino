@@ -1,78 +1,66 @@
+#include <PID_v1.h>
+#include <Encoder.h>
+
+// Pins
 const byte motorEncoderAPort = 2;
 const byte motorEncoderBPort = 3;
 const byte motorL1Port = 5;
 const byte motorL2Port = 6;
-const byte motorEnablePort = 11;
+const byte motorSpeedPort = 11;
 
-float angle = 0.0;
-int phase;
+// Encoder setup
+Encoder myEnc(2, 3);
+
+// PID Control Setup
+
+double currentAngle;
+double velocity;
+double setDesiredAngle;
+double desiredAngle;
+double kp = 1.3, ki = 0.2, kd = 0.03;
+
+// Input = currPosition, output = velocity, setpoint = speed
+PID myPID(&currentAngle, &velocity, &setDesiredAngle, kp, ki, kd, DIRECT);
 
 void setup() {
+
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
 
-  analogWrite(motorEnablePort, 100);
-  digitalWrite(motorL1Port, 0);
-  digitalWrite(motorL2Port, 1);
+  // Motor pin setup
+  pinMode(motorL1Port, OUTPUT);
+  pinMode(motorL2Port, OUTPUT);
+  pinMode(motorSpeedPort, OUTPUT);
 
-  attachInterrupt(digitalPinToInterrupt(motorEncoderAPort), updateAngle, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(motorEncoderBPort), updateAngle, CHANGE);
+  // Motor Encoder Pin Setup
+  pinMode(motorEncoderAPort, INPUT);
+  pinMode(motorEncoderBPort, INPUT);
+
+  myPID.SetMode(AUTOMATIC);
+
+  myPID.SetOutputLimits(-255, 255);
 }
 
 void loop() {
-  
+  analogWrite(motorSpeedPort, 140);
+    digitalWrite(motorL1Port, HIGH);
+    digitalWrite(motorL2Port, LOW);
 }
 
-void updateAngle() {
-  int encoderAResult = digitalRead(motorEncoderAPort);
-  int encoderBResult = digitalRead(motorEncoderBPort);
+void turnMotor(int speed, int direction) {
 
-  // If the phase hasn't been defined...
-  if (!phase) {
-    setPhase(encoderAResult, encoderBResult);
+  if (direction == -1) {
+    Serial.println("Spinning counterclockwise " + String(speed));
+    analogWrite(motorSpeedPort, speed);
+    digitalWrite(motorL1Port, LOW);
+    digitalWrite(motorL2Port, HIGH); 
   }
-  
-  else {
-    int oldPhase = phase;
-    setPhase(encoderAResult, encoderBResult);
-    setAngle(phase, oldPhase);
-    Serial.println("Angle = " + String(angle));
-  }
-}
 
-void setPhase(int encoderA, int encoderB) {
-  phase = (encoderA << 1) + encoderB;
-}
-
-void setAngle(int newPhase, int oldPhase) {
-  int total = (newPhase << 2) + oldPhase;
-  switch (total) {
-    // CCW from phase 01 to phase 00
-    case 1:
-    // CCW from phase 00 to phase 10
-    case 8:
-    // CCW from phase 10 to phase 11
-    case 15:
-    // CCW from phase 11 to phase 01
-    case 7:
-      angle -= 0.25;
-      break;
-
-    // CW from phase 00 to phase 01
-    case 4:
-    // CW from phase 01 to phase 11
-    case 13:
-    // CW from phase 11 to phase 10
-    case 11:
-    // CW from phase 10 to phase 00
-    case 2:
-      angle += 0.25;
-      break;
-
-    default:
-      Serial.println("Motor encoder entered illegal phase transition!");
-    
+  else if (direction == 1) {
+    Serial.println("Spinning clockwise " + String(speed));
+    analogWrite(motorSpeedPort, speed);
+    digitalWrite(motorL1Port, LOW);
+    digitalWrite(motorL2Port, HIGH);
   }
 }
-
 
