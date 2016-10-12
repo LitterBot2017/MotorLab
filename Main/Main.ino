@@ -189,10 +189,16 @@ void loop() {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
       case M_POS_ACT:
-        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        actuator_min = 0;
+        actuator_max = 360;
+        actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        // TODO: call motor command
         break;
       case M_VEL_ACT:
-        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        actuator_min = -70;
+        actuator_max = 70;
+        actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        // TODO: call motor command
         break;
       case SERVO_ACT:
         actuator_min = 0;
