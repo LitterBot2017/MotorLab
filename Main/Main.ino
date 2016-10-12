@@ -1,6 +1,7 @@
 #include <ros.h>
 #include <std_msgs/Int16.h>
 #include <motorlab_msgs/MotorLab_Arduino.h>
+#include <motorlab_msgs/MotorLab_PC.h>
 #include "Ultrasonic.h"
 #include "IRSensor.h"
 #include "LightGate.h"
@@ -41,16 +42,15 @@ int actuator_state = 0;
 //Vars for mapping
 int sensor_max = 0;
 int sensor_min = 0;
+int sensor_reading = 0;
 int actuator_max = 0;
 int actuator_min = 0;
+int actuator_effort = 0;
 
 // ROS things
 ros::NodeHandle arduinoNode;
 motorlab_msgs::MotorLab_Arduino ArduinoMsg;
 motorlab_msgs::MotorLab_PC PCMsg;
-
-ros::Publisher output_msg("ArduinoMsg",&ArduinoMsg);
-ros::Subscriber <motorlab_msgs::MotorLab_PC> input_msg("PCMsg",&PC_callback);
 
 void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
 {
@@ -64,6 +64,9 @@ void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
   PCMsg.ultra_checked = pc_msg.ultra_checked;
 }
 
+ros::Publisher output_msg("ArduinoMsg",&ArduinoMsg);
+ros::Subscriber <motorlab_msgs::MotorLab_PC> input_msg("PCMsg",&PC_callback);
+
 /************** Arduino Specific *********************/
 
 void setup() {
@@ -71,7 +74,7 @@ void setup() {
   arduinoNode.initNode();
   arduinoNode.advertise(output_msg);
   
-  arduinoNode.subscribe(sub);
+  arduinoNode.subscribe(input_msg);
 
   // Initialize Actuators
   myServo.attach(9);
@@ -96,6 +99,8 @@ void loop() {
                 ULTRA_SENSE*PCMsg.ultra_checked;
   switch(sensor_state){
     case THERM_SENSE:
+      sensor_max = 600;
+      sensor_min = 400;
       break;
     case LGATE_SENSE:
       break;
@@ -115,11 +120,16 @@ void loop() {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
       case M_POS_ACT:
+        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
         break;
       case M_VEL_ACT:
+        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
         break;
       case SERVO_ACT:
-
+        actuator_min = 0;
+        actuator_max = 180;
+        actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        myServo.write(actuator_effort);
         break;
       default:
         break;
