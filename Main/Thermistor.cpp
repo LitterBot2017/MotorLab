@@ -5,7 +5,6 @@ Thermistor::Thermistor(int pin)
 {
 
       pinNum= pin;
-      pinMode(pin,INPUT);
 }
 
 int Thermistor::gettemperature()

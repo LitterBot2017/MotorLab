@@ -6,7 +6,7 @@
 class StepperMotor
 {
     public:
-	        StepperMotor(int pin1, int pin2);
+	        StepperMotor(int _dirpin, int _steppin);
      void moveDegrees(int degreeNumber);
     private:
      void stepDegrees(bool dir, int steps);

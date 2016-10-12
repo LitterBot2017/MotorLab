@@ -1,11 +1,11 @@
 #include "Arduino.h"
 #include "StepperMotor.h"
 
-StepperMotor::StepperMotor(int pin1, int pin2)
+StepperMotor::StepperMotor(int _dirpin, int _steppin)
 {
-    dirPin=pin1;
+    dirPin=_dirpin;
     pinMode(dirPin,OUTPUT);
-	  stepPin=pin2;
+	  stepPin=_steppin;
 	  pinMode(stepPin,OUTPUT);
 	
 }
