@@ -13,9 +13,6 @@ int but0_old_state = LOW;
 int but0_new_state = LOW;
 int current_state = 0;
 
-motorlab_msgs::MotorLab_Arduino ArduinoMsg;
-ros::Publisher output_msg("ArduinoMsg",&ArduinoMsg);
-
 //State Defines
 #define NO_SENSE 0
 #define THERM_SENSE 1
@@ -39,6 +36,11 @@ Ultrasonic ultraSensor(A0);
 IRSensor irSensor(A1);
 Thermistor tempSensor(A2);
 LightGate lightGateSensor(7);
+
+// ROS things
+ros::NodeHandle arduinoNode;
+motorlab_msgs::MotorLab_Arduino ArduinoMsg;
+motorlab_msgs::MotorLab_PC PCMsg;
 
 unsigned long time0 = millis();
 
@@ -93,11 +95,6 @@ int sensor_reading = 0;
 int actuator_max = 0;
 int actuator_min = 0;
 int actuator_effort = 0;
-
-// ROS things
-ros::NodeHandle arduinoNode;
-motorlab_msgs::MotorLab_Arduino ArduinoMsg;
-motorlab_msgs::MotorLab_PC PCMsg;
 
 void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
 {
