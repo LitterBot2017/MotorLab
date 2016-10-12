@@ -9,6 +9,11 @@
 #include "Thermistor.h"
 #include "StepperMotor.h"
 
+const int button0_pin = 2;
+int but0_old_state = LOW;
+int but0_new_state = LOW;
+int current_state = 0;
+
 //State Defines
 #define NO_SENSE 0
 #define THERM_SENSE 1
@@ -33,6 +38,50 @@ IRSensor irSensor(A1);
 Thermistor tempSensor(A2);
 LightGate lightGateSensor(7);
 
+// ROS things
+ros::NodeHandle arduinoNode;
+motorlab_msgs::MotorLab_Arduino ArduinoMsg;
+motorlab_msgs::MotorLab_PC PCMsg;
+
+unsigned long time0 = millis();
+
+void but0_state()
+{
+  if (but0_new_state == HIGH && but0_old_state == LOW)
+  {
+    if (millis() - time0 > 100)
+    {
+      time0 = millis();
+      but0_old_state = but0_new_state;
+    }
+  }
+  if (but0_new_state == LOW && but0_old_state == HIGH)
+  {
+    if (millis() - time0 > 100)
+    {
+      time0 = millis();
+      but0_old_state = but0_new_state;
+      current_state++;
+      current_state %= 2;
+      ArduinoMsg.button_state=current_state*10;
+    }
+  }
+}
+
+void button0_isr_change()
+{
+  current_state++; 
+  if(but0_new_state==HIGH)
+  {
+    but0_new_state=LOW;
+  }
+  else
+  {
+    but0_new_state=HIGH;
+  }
+  but0_state();
+}
+
 //Gobal var for Servo Angle
 int servo_angle = 0;
 
@@ -47,11 +96,6 @@ int sensor_reading = 0;
 int actuator_max = 0;
 int actuator_min = 0;
 int actuator_effort = 0;
-
-// ROS things
-ros::NodeHandle arduinoNode;
-motorlab_msgs::MotorLab_Arduino ArduinoMsg;
-motorlab_msgs::MotorLab_PC PCMsg;
 
 void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
 {
@@ -82,6 +126,8 @@ void setup() {
 
   // Initialize Actuators
   myServo.attach(9);
+  pinMode(button0_pin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(button0_pin),button0_isr_change,CHANGE);
 }
 
 void loop() {
@@ -91,7 +137,7 @@ void loop() {
   ArduinoMsg.servo_position = servo_angle;
   ArduinoMsg.stepper_motor_position = 0;
   ArduinoMsg.temperature = tempSensor.gettemperature();
-  ArduinoMsg.light_gate_state = lightGateSensor.getState();
+  ArduinoMsg.light_gate_state=lightGateSensor.getState();
   ArduinoMsg.ultrasonic_distance = ultraSensor.filteredReading();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
