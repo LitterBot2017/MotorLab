@@ -1,6 +1,4 @@
-#include <PID_v1.h>
 #include <Encoder.h>
-
 
 // Four functions:
 // setMotorPosition (degrees)
@@ -19,7 +17,6 @@ const byte motorSpeedPort = 11;
 Encoder myEnc(2, 3);
 
 // PID Control Setup
-
 int currentAngle;
 int velocity;
 int desiredAngle;
@@ -38,7 +35,7 @@ int iControl;
 int dControl;
 int control;
 
-double kp = 1, ki = 0, kd = 0.1;
+double kp = 0.2, ki = 0, kd = 0.02;
 
 void setup() {
 
