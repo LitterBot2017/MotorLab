@@ -7,6 +7,7 @@
 #include "LightGate.h"
 #include "Servo.h"
 #include "Thermistor.h"
+#include "StepperMotor.h"
 
 //State Defines
 #define NO_SENSE 0
@@ -23,7 +24,7 @@
 
 // Actuators
 Servo myServo;
-// TODO: Initialize Stepper
+StepperMotor myStepper(10, 11);
 // TODO: Initialize DC Motor
 
 // Sensors
@@ -54,7 +55,10 @@ motorlab_msgs::MotorLab_PC PCMsg;
 
 void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
 {
-  PCMsg.stepper_angle = pc_msg.stepper_angle;
+  if (pc_msg.stepper_angle != 0)
+  {
+    PCMsg.stepper_angle = pc_msg.stepper_angle;
+  }
   PCMsg.motor_position_checked = pc_msg.motor_position_checked;
   PCMsg.motor_speed_checked = pc_msg.motor_speed_checked;
   PCMsg.servo_checked = pc_msg.servo_checked;
@@ -91,6 +95,12 @@ void loop() {
   ArduinoMsg.ultrasonic_distance = ultraSensor.filteredReading();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
+
+  //Stepper Handling
+  if(PCMsg.stepper_angle != 0){
+    myStepper.moveDegrees(PCMsg.stepper_angle);
+    PCMsg.stepper_angle = 0;
+  }
   
   //Sensor State
   sensor_state = THERM_SENSE*PCMsg.thermistor_checked + 
