@@ -84,7 +84,7 @@ void loop() {
   // package the output message
   ArduinoMsg.dc_motor_position = 0;
   ArduinoMsg.dc_motor_speed = 0;
-  ArduinoMsg.servo_position = 0;
+  ArduinoMsg.servo_position = servo_angle;
   ArduinoMsg.stepper_motor_position = 0;
   ArduinoMsg.temperature = tempSensor.gettemperature();
   ArduinoMsg.light_gate_state = lightGateSensor.getState();
@@ -99,8 +99,10 @@ void loop() {
                 ULTRA_SENSE*PCMsg.ultra_checked;
   switch(sensor_state){
     case THERM_SENSE:
-      sensor_max = 600;
       sensor_min = 400;
+      sensor_max = 600;
+      sensor_reading = ArduinoMsg.temperature;
+      sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case LGATE_SENSE:
       break;
@@ -129,9 +131,11 @@ void loop() {
         actuator_min = 0;
         actuator_max = 180;
         actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        servo_angle = actuator_effort;
         myServo.write(actuator_effort);
         break;
       default:
+        myServo.write(0);
         break;
     }
   }
