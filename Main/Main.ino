@@ -143,7 +143,7 @@ void loop() {
   output_msg.publish(&ArduinoMsg);
 
   //Stepper Handling
-  if(PCMsg.stepper_angle != 0){
+  if((PCMsg.stepper_angle != 0) && (current_state != 0)){
     myStepper.moveDegrees(PCMsg.stepper_angle);
     PCMsg.stepper_angle = 0;
   }
@@ -167,13 +167,16 @@ void loop() {
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case IRRNG_SENSE:
-      sensor_min = 50
-      sensor_max = 600
+      sensor_min = 50;
+      sensor_max = 600;
       sensor_reading = ArduinoMsg.ir_distance;
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case ULTRA_SENSE:
-      break;
+      sensor_min = 1000;
+      sensor_max = 2500;
+      sensor_reading = ArduinoMsg.ultrasonic_distance;
+      sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
     default:
       sensor_min = -1;
       sensor_max = -1;
