@@ -33,7 +33,7 @@ StepperMotor myStepper(10, 11);
 // TODO: Initialize DC Motor
 
 // Sensors
-Ultrasonic ultraSensor(A0);
+Ultrasonic ultraSensor(4);
 IRSensor irSensor(A1);
 Thermistor tempSensor(A2);
 LightGate lightGateSensor(7);
@@ -138,7 +138,7 @@ void loop() {
   ArduinoMsg.stepper_motor_position = 0;
   ArduinoMsg.temperature = tempSensor.gettemperature();
   ArduinoMsg.light_gate_state=lightGateSensor.getState();
-  ArduinoMsg.ultrasonic_distance = ultraSensor.filteredReading();
+  ArduinoMsg.ultrasonic_distance = ultraSensor.pulse_width_measurement();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
 
