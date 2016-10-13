@@ -2,10 +2,8 @@
 #include "Arduino.h"
 #include <Encoder.h>
 
-MotorVelocityController::MotorVelocityController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController) {
+MotorVelocityController::MotorVelocityController(Encoder* pEncoder, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController) {
 
-  mMotorEncoderAPort = pMotorEncoderAPort;
-  mMotorEncoderBPort = pMotorEncoderBPort;
   mMotorL1Port = pMotorL1Port;
   mMotorL2Port = pMotorL2Port;
   mMotorSpeedPort = pMotorSpeedPort;
@@ -19,50 +17,72 @@ MotorVelocityController::MotorVelocityController(byte pMotorEncoderAPort, byte p
   pinMode(mMotorEncoderAPort, INPUT);
   pinMode(mMotorEncoderBPort, INPUT);
 
-  myEnc = new Encoder(mMotorEncoderAPort, mMotorEncoderBPort);
+  myEnc = pEncoder;
   motorController = pMotorController;
 
+  pidTimeLast = millis();
   timeLast = millis();
   errorLast = 0;
-  lastAngle = getAngle();
+  lastAngle = 0;
+  currentAngle = 0;
+  currentVelocity = 0;
+
+  pidCurrAngle = 0;
+  pidLastAngle = 0;
 }
 
-void MotorVelocityController::setVelocity(int desiredRPM) {
-/*
-  desiredVelocity = desiredRPM;
+/*void MotorVelocityController::setVelocity(int desired) {
+
+  desiredVelocity = desired;
   currentVelocity = getVeloctiyRPM();
+  Serial.println("setVel -- currentVel = " + String(currentVelocity));
 
-  errorNow = desiredAngle - currentAngle;
-  timeNow = millis();
-  timeDiff = timeNow - timeLast;
-  errorDiff = errorNow - errorLast;
+  pidCurrAngle = getAngle();
+  if ((abs(pidCurrAngle - pidLastAngle) % desired) == 0) {
+    Serial.println("if check = " + String(abs(pidCurrAngle - pidLastAngle) % desired));
 
-  pControl = kp * errorNow;
-  errorSum += (errorNow * timeDiff);
-  iControl = ki * errorSum;
-  dControl = kd * (errorDiff/timeDiff);
-  control = pControl + iControl + dControl;
+    errorNow = desiredVelocity - currentVelocity;
+    pidTimeNow = millis();
+    pidTimeDiff = pidTimeNow - pidTimeLast;
+    errorDiff = errorNow - errorLast;
+  
+    pControl = kp * errorNow;
+    errorSum += (errorNow * pidTimeDiff);
+    iControl = ki * errorSum;
+    dControl = kd * (errorDiff/pidTimeDiff);
+    control = pControl + iControl + dControl;
+  
+    pidTimeLast = pidTimeNow;
+    errorLast = errorNow;
 
-  if ((millis() % 1000) == 0) {
-    Serial.println("errorNow: " + String(errorNow) + "; errorDiff: " + String(errorDiff) + "; control = " + String(control));
+    pidLastAngle = pidCurrAngle;
+    Serial.println("errorNow: " + String(errorNow) + "; errorDiff: " + String(errorDiff) + "; control = " + String(control) + "; currVel = " + String(currentVelocity) + "; desiredVelocity " + desiredVelocity);
   }
 
-  timeLast = timeNow;
-  errorLast = errorNow;
+  (*motorController).turnMotor(control);
+} */
 
-  if (abs(errorNow) <= 1) {
-    digitalWrite(mMotorL1Port, LOW);
-    digitalWrite(mMotorL2Port, HIGH);
-    analogWrite(mMotorSpeedPort, 0);
-  } else {
-    (*motorController).turnMotor(control);
-  }*/
+void MotorVelocityController::setVelocity(int desired) {
+
+  desiredVelocity = desired;
+
+  currentVelocity = getVeloctiyRPM();
+  if (currentVelocity < desiredVelocity) {
+    control++;
+  } else if (currentVelocity > desiredVelocity) {
+    control--;
+  }
+  control = control % 256;
+    
+  Serial.println("Desired = " + String(desiredVelocity) + "; currentVelocity = " + String(currentVelocity));
+
+  (*motorController).turnMotor(control);
 }
 
 int MotorVelocityController::getVeloctiyRPM() {
 
   currentAngle = getAngle();
-
+  //Serial.println("lastANgle = " + String(lastAngle) + "; currentANgle = " + String(currentAngle));
   if (abs(lastAngle - currentAngle) > 0) {
 
     timeNow = millis();
@@ -96,12 +116,12 @@ int MotorVelocityController::getVeloctiyRPM() {
 }
 
 double MotorVelocityController::degreesPerSecondToRPM(double dps) {
-  return ((dps * 60) / 360);
+  return ((dps * 60) / 360.0);
 }
 
 int MotorVelocityController::getAngle() {
 
-  currentAngle = (((*myEnc).read()/2) % 360);
-  return currentAngle;
+  return (((*myEnc).read()/2) % 360);
+
 }
 

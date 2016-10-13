@@ -12,7 +12,7 @@
 class MotorPositionController {
 
   public:
-    MotorPositionController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController);
+    MotorPositionController(Encoder* pEncoder, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController);
     int getAngle();
     void setAngle(int desired);
 
@@ -40,9 +40,7 @@ class MotorPositionController {
     int iControl;
     int dControl;
     int control;
-  
-    byte mMotorEncoderAPort;
-    byte mMotorEncoderBPort;
+
     byte mMotorL1Port;
     byte mMotorL2Port;
     byte mMotorSpeedPort;
