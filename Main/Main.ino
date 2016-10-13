@@ -206,12 +206,12 @@ void loop() {
   }
 
   //Motor velocit handling when no sensor checked
-  if((sensor_state == 0) && (current_state != 0)){
+  if((sensor_state == 0) && (M_VEL_ACT*PCMsg.motor_speed_checked)&&(current_state != 0)){
     //motor velocity control code goes here
     (*motorVelocityController).setVelocity(PCMsg.motor_velocity);
   }
 
-  if((sensor_state == 0) && (current_state != 0)){
+  if((sensor_state == 0) && (M_POS_ACT*PCMsg.motor_position_checked) && (current_state != 0)){
     //motor angle control code goes here
     (*motorPositionController).setAngle(PCMsg.motor_angle);
   }
