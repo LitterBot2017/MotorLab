@@ -16,8 +16,8 @@ Ultrasonic::Ultrasonic(int pin)
 
 int Ultrasonic::pulse_width_measurement()
 {  
-   int pulse_val= (int) pulseIn(pinNum,HIGH);
-   if(pulse_val<0)
+   long pulse_val= pulseIn(pinNum,HIGH);
+   if(pulse_val>3000)
    {
     pulse_val=3000;
    }
@@ -29,7 +29,7 @@ int Ultrasonic::pulse_width_measurement()
    {
      reading=0;
    } 
-   return total/readingsNum;
+   return (int) total/readingsNum;
 }
 
 int Ultrasonic::filteredReading()
