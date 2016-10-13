@@ -70,7 +70,6 @@ void but0_state()
 
 void button0_isr_change()
 {
-  current_state++; 
   if(but0_new_state==HIGH)
   {
     but0_new_state=LOW;
@@ -184,7 +183,7 @@ void loop() {
   }
 
   //Actuator State
-  if ((sensor_max != -1) && (sensor_min != -1) && (current_state > 0))//run only if sensor selection is valid
+  if ((sensor_max != -1) && (sensor_min != -1) && (current_state != 0))//run only if sensor selection is valid
   {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
