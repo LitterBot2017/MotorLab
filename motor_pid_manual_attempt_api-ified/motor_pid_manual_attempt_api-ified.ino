@@ -2,11 +2,11 @@
 #include "motor_velocity_controller.h"
 
 // Pins
-const byte motorEncoderAPort = 2;
-const byte motorEncoderBPort = 3;
-const byte motorL1Port = 5;
-const byte motorL2Port = 6;
-const byte motorSpeedPort = 11;
+const byte motorEncoderAPort = 19;
+const byte motorEncoderBPort = 18;
+const byte motorL1Port = 6;
+const byte motorL2Port = 7;
+const byte motorSpeedPort = 12;
 
 int desired;
 
@@ -37,9 +37,9 @@ void loop() {
   }
   //Serial.println("currentAngle: " + String(motorPositionController.getAngle()));
 
-  (*motorVelocityController).setVelocity(desired);
+//  (*motorVelocityController).setVelocity(desired);
 
-  //(*motorPositionController).setAngle(desired);
+  (*motorPositionController).setAngle(desired);
 
 }
 

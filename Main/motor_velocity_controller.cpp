@@ -74,7 +74,7 @@ void MotorVelocityController::setVelocity(int desired) {
   }
   control = control % 256;
     
-  Serial.println("Desired = " + String(desiredVelocity) + "; currentVelocity = " + String(currentVelocity));
+//  Serial.println("Desired = " + String(desiredVelocity) + "; currentVelocity = " + String(currentVelocity));
 
   (*motorController).turnMotor(control);
 }

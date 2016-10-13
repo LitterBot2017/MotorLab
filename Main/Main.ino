@@ -35,11 +35,11 @@ Servo myServo;
 StepperMotor myStepper(10, 11);
 /******* Begin Motor Stuff **********/
 // Pins
-const byte motorEncoderAPort = 2;
-const byte motorEncoderBPort = 3;
-const byte motorL1Port = 5;
-const byte motorL2Port = 6;
-const byte motorSpeedPort = 11;
+const byte motorEncoderAPort = 19;
+const byte motorEncoderBPort = 18;
+const byte motorL1Port = 6;
+const byte motorL2Port = 7;
+const byte motorSpeedPort = 12;
 
 MotorController motorController(motorL1Port, motorL2Port, motorSpeedPort);
 MotorPositionController* motorPositionController;
@@ -192,8 +192,8 @@ void loop() {
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case ULTRA_SENSE:
-      sensor_min = 1000;
-      sensor_max = 2500;
+      sensor_min = 850;
+      sensor_max = 5000;
       sensor_reading = ArduinoMsg.ultrasonic_distance;
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
     default:
@@ -208,8 +208,8 @@ void loop() {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
       case M_POS_ACT:
-        actuator_min = 0;
-        actuator_max = 360;
+        actuator_min = 60;
+        actuator_max = 300;
         actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
         (*motorPositionController).setAngle(actuator_effort);
         break;
