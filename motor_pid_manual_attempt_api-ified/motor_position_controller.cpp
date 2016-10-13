@@ -22,6 +22,8 @@ MotorPositionController::MotorPositionController(byte pMotorEncoderAPort, byte p
   timeLast = millis();
   errorLast = 0;
 
+  errorSum = 0;
+  
   myEnc = new Encoder(mMotorEncoderAPort, mMotorEncoderBPort);
   motorController = pMotorController;
 }
