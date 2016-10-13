@@ -2,10 +2,8 @@
 #include "Arduino.h"
 #include <Encoder.h>
 
-MotorPositionController::MotorPositionController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController) {
+MotorPositionController::MotorPositionController(Encoder* pEncoder, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController) {
 
-  mMotorEncoderAPort = pMotorEncoderAPort;
-  mMotorEncoderBPort = pMotorEncoderBPort;
   mMotorL1Port = pMotorL1Port;
   mMotorL2Port = pMotorL2Port;
   mMotorSpeedPort = pMotorSpeedPort;
@@ -24,7 +22,7 @@ MotorPositionController::MotorPositionController(byte pMotorEncoderAPort, byte p
 
   errorSum = 0;
   
-  myEnc = new Encoder(mMotorEncoderAPort, mMotorEncoderBPort);
+  myEnc = pEncoder;
   motorController = pMotorController;
 }
 

@@ -13,7 +13,7 @@
 class MotorVelocityController {
 
   public:
-    MotorVelocityController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController);
+    MotorVelocityController(Encoder* pEncoder, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort, MotorController* pMotorController);
     int getVeloctiyRPM();
     void setVelocity(int desiredRPM);
 
@@ -34,11 +34,18 @@ class MotorVelocityController {
     int errorNow;
     int errorLast;
     int errorDiff;
-    int errorSum;
+    long errorSum;
     
     int timeNow;
     int timeLast;
     int timeDiff;
+
+    int pidTimeNow;
+    int pidTimeDiff;
+    int pidTimeLast;
+
+    int pidCurrAngle;
+    int pidLastAngle;
     
     int pControl;
     int iControl;
@@ -51,7 +58,7 @@ class MotorVelocityController {
     byte mMotorL2Port;
     byte mMotorSpeedPort;
 
-    const double kp = 0.2, ki = 0, kd = 0.02;
+    const double kp = 10, ki = 0, kd = 0.1;
 
     double degreesPerSecondToRPM(double dps);
     int getAngle();
