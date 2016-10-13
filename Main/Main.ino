@@ -157,9 +157,9 @@ void loop() {
   ArduinoMsg.dc_motor_speed = (*motorVelocityController).getVeloctiyRPM();
   ArduinoMsg.servo_position = servo_angle;
   ArduinoMsg.stepper_motor_position = 0;
-  ArduinoMsg.temperature = tempSensor.gettemperature();
+  ArduinoMsg.temperature = PCMsg.motor_velocity;//tempSensor.gettemperature();
   ArduinoMsg.light_gate_state=lightGateSensor.getState();
-  ArduinoMsg.ultrasonic_distance = ultraSensor.pulse_width_measurement();
+  ArduinoMsg.ultrasonic_distance = PCMsg.motor_angle;;//ultraSensor.pulse_width_measurement();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
 
@@ -198,6 +198,7 @@ void loop() {
       sensor_max = 5000;
       sensor_reading = ArduinoMsg.ultrasonic_distance;
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
+      break;
     default:
       sensor_min = -1;
       sensor_max = -1;
@@ -207,10 +208,12 @@ void loop() {
   //Motor velocit handling when no sensor checked
   if((sensor_state == 0) && (current_state != 0)){
     //motor velocity control code goes here
+    (*motorVelocityController).setVelocity(PCMsg.motor_velocity);
   }
 
   if((sensor_state == 0) && (current_state != 0)){
     //motor angle control code goes here
+    (*motorPositionController).setAngle(PCMsg.motor_angle);
   }
 
   //Actuator State
