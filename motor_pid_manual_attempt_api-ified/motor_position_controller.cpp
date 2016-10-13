@@ -16,8 +16,8 @@ MotorPositionController::MotorPositionController(byte pMotorEncoderAPort, byte p
   pinMode(mMotorSpeedPort, OUTPUT);
 
   // Motor Encoder Pin Setup
-  pinMode(mMotorEncoderAPort, INPUT);
-  pinMode(mMotorEncoderBPort, INPUT);
+  // pinMode(mMotorEncoderAPort, INPUT);
+  // pinMode(mMotorEncoderBPort, INPUT);
 
   timeLast = millis();
   errorLast = 0;
@@ -50,13 +50,13 @@ void MotorPositionController::setAngle(int desired) {
   timeLast = timeNow;
   errorLast = errorNow;
 
-  if (abs(errorNow) <= 1) {
-    digitalWrite(mMotorL1Port, HIGH);
-    digitalWrite(mMotorL2Port, HIGH);
-    digitalWrite(mMotorSpeedPort, HIGH);
-  } else {
+//  if (abs(errorNow) <= 1) {
+//    digitalWrite(mMotorL1Port, HIGH);
+//    digitalWrite(mMotorL2Port, HIGH);
+//    digitalWrite(mMotorSpeedPort, HIGH);
+//  } else {
     (*motorController).turnMotor(control);
-  }
+//  }
 }
 
 int MotorPositionController::getAngle() {
