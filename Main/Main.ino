@@ -109,6 +109,8 @@ void PC_callback(const motorlab_msgs::MotorLab_PC& pc_msg)
   PCMsg.light_gate_checked = pc_msg.light_gate_checked;
   PCMsg.ir_checked = pc_msg.ir_checked;
   PCMsg.ultra_checked = pc_msg.ultra_checked;
+  PCMsg.motor_velocity = pc_msg.motor_velocity;  
+  PCMsg.motor_angle = pc_msg.motor_angle;
 }
 
 ros::Publisher output_msg("ArduinoMsg",&ArduinoMsg);
@@ -180,6 +182,15 @@ void loop() {
       sensor_min = -1;
       sensor_max = -1;
       break;
+  }
+
+  //Motor velocit handling when no sensor checked
+  if((sensor_state == 0) && (current_state != 0)){
+    //motor velocity control code goes here
+  }
+
+  if((sensor_state == 0) && (current_state != 0)){
+    //motor angle control code goes here
   }
 
   //Actuator State
