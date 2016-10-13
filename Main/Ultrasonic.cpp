@@ -11,6 +11,25 @@ int reading=0;
 Ultrasonic::Ultrasonic(int pin)
 {
     pinNum=pin;
+    pinMode(pin,INPUT);
+}
+
+int Ultrasonic::pulse_width_measurement()
+{  
+   long pulse_val= pulseIn(pinNum,HIGH);
+   if(pulse_val>6000)
+   {
+    pulse_val=6000;
+   }
+   total=total-filterWindow[reading];
+   filterWindow[reading]=pulse_val;
+   total=total+filterWindow[reading];
+   reading=reading+1;
+   if(reading>=readingsNum)
+   {
+     reading=0;
+   } 
+   return (int) total/readingsNum;
 }
 
 int Ultrasonic::filteredReading()

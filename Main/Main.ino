@@ -33,10 +33,10 @@ StepperMotor myStepper(10, 11);
 // TODO: Initialize DC Motor
 
 // Sensors
-Ultrasonic ultraSensor(A0);
+Ultrasonic ultraSensor(4);
 IRSensor irSensor(A1);
 Thermistor tempSensor(A2);
-LightGate lightGateSensor(7);
+LightGate lightGateSensor(5);
 
 // ROS things
 ros::NodeHandle arduinoNode;
@@ -70,7 +70,6 @@ void but0_state()
 
 void button0_isr_change()
 {
-  current_state++; 
   if(but0_new_state==HIGH)
   {
     but0_new_state=LOW;
@@ -138,12 +137,12 @@ void loop() {
   ArduinoMsg.stepper_motor_position = 0;
   ArduinoMsg.temperature = tempSensor.gettemperature();
   ArduinoMsg.light_gate_state=lightGateSensor.getState();
-  ArduinoMsg.ultrasonic_distance = ultraSensor.filteredReading();
+  ArduinoMsg.ultrasonic_distance = ultraSensor.pulse_width_measurement();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
 
   //Stepper Handling
-  if(PCMsg.stepper_angle != 0){
+  if((PCMsg.stepper_angle != 0) && (current_state != 0)){
     myStepper.moveDegrees(PCMsg.stepper_angle);
     PCMsg.stepper_angle = 0;
   }
@@ -161,11 +160,22 @@ void loop() {
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case LGATE_SENSE:
+      sensor_min = 0;
+      sensor_max = 1;
+      sensor_reading = ArduinoMsg.light_gate_state;
+      sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case IRRNG_SENSE:
+      sensor_min = 50;
+      sensor_max = 600;
+      sensor_reading = ArduinoMsg.ir_distance;
+      sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case ULTRA_SENSE:
-      break;
+      sensor_min = 1000;
+      sensor_max = 2500;
+      sensor_reading = ArduinoMsg.ultrasonic_distance;
+      sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
     default:
       sensor_min = -1;
       sensor_max = -1;
@@ -173,15 +183,21 @@ void loop() {
   }
 
   //Actuator State
-  if ((sensor_max != -1) && (sensor_min != -1))//run only if sensor selection is valid
+  if ((sensor_max != -1) && (sensor_min != -1) && (current_state != 0))//run only if sensor selection is valid
   {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
       case M_POS_ACT:
-        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        actuator_min = 0;
+        actuator_max = 360;
+        actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        // TODO: call motor command
         break;
       case M_VEL_ACT:
-        // actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        actuator_min = -70;
+        actuator_max = 70;
+        actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
+        // TODO: call motor command
         break;
       case SERVO_ACT:
         actuator_min = 0;
@@ -191,9 +207,14 @@ void loop() {
         myServo.write(actuator_effort);
         break;
       default:
-        myServo.write(0);
+        myServo.write(servo_angle);
+        // TODO: Write motor velocity zero
         break;
     }
+  }
+  else{
+    myServo.write(servo_angle);
+    // TODO: Write motor velocity zero
   }
 
 

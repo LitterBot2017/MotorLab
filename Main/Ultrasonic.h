@@ -5,11 +5,12 @@
 
 class Ultrasonic
 {
-    public:
-	Ultrasonic(int pin);
-	int filteredReading();
-    private:
-	int pinNum;
+  public:
+    Ultrasonic(int pin);
+	  int filteredReading();
+    int pulse_width_measurement();
+  private:
+	  int pinNum;
 };
 
 #endif
