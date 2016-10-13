@@ -196,6 +196,7 @@ void loop() {
       sensor_max = 5000;
       sensor_reading = ArduinoMsg.ultrasonic_distance;
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
+      break;
     default:
       sensor_min = -1;
       sensor_max = -1;

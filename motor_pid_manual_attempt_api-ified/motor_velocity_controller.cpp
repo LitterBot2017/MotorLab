@@ -64,17 +64,51 @@ MotorVelocityController::MotorVelocityController(Encoder* pEncoder, byte pMotorL
 
 void MotorVelocityController::setVelocity(int desired) {
 
-  desiredVelocity = desired;
+  if (desired != desiredVelocity) {
+    if (desired > 0 && desired <= 10) {
+      control = 30;
+    } else if (desired > 10 && desired <= 20) {
+      control = 45;
+    } else if (desired > 20 && desired <= 30) {
+      control =  55;
+    } else if (desired > 30 && desired <= 40) {
+      control = 67;
+    } else if (desired > 40 && desired <= 50) {
+      control = 82;
+    } else if (desired > 50 && desired <= 60) {
+      control = 110;
+    } else if (desired > 60 && desired <= 70) {
+      control = 180;
+    } else if (desired < 0 && desired >= -10) {
+      control = -30;
+    } else if (desired < -10 && desired >= -20) {
+      control = -45;
+    } else if (desired < -20 && desired >= -30) {
+      control =  -57;
+    } else if (desired < -30 && desired >= -40) {
+      control = -67;
+    } else if (desired < -40 && desired >= -50) {
+      control = -82;
+    } else if (desired < -50 && desired >= -60) {
+      control = -110;
+    } else if (desired < -60 && desired >= -70) {
+      control = -145;
+    }
+  }
 
+  desiredVelocity = desired;
   currentVelocity = getVeloctiyRPM();
-  if (currentVelocity < desiredVelocity) {
+  if (desiredVelocity == 0) {
+    control = 0;
+  } else if (currentVelocity < desiredVelocity) {
     control++;
   } else if (currentVelocity > desiredVelocity) {
+    int diff = abs(currentVelocity - desiredVelocity) * 3;
     control--;
   }
   control = control % 256;
     
-  Serial.println("Desired = " + String(desiredVelocity) + "; currentVelocity = " + String(currentVelocity));
+  Serial.println("Desired = " + String(desiredVelocity) + "; currentVelocity = " + String(currentVelocity) + "; control = " + String(control));
 
   (*motorController).turnMotor(control);
 }
@@ -90,7 +124,10 @@ int MotorVelocityController::getVeloctiyRPM() {
     timeLast = timeNow;
 
     double dps = ((currentAngle - lastAngle) / (timeDiff / 1000.0));
-    currentVelocity = ((int) degreesPerSecondToRPM(dps));
+    int tempCurrentVelocity = ((int) degreesPerSecondToRPM(dps));
+    if (tempCurrentVelocity < 80 && tempCurrentVelocity > -80) {
+      currentVelocity = tempCurrentVelocity;
+    }
     lastAngle = currentAngle;
   }
 
