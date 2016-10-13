@@ -157,9 +157,9 @@ void loop() {
   ArduinoMsg.dc_motor_speed = (*motorVelocityController).getVeloctiyRPM();
   ArduinoMsg.servo_position = servo_angle;
   ArduinoMsg.stepper_motor_position = 0;
-  ArduinoMsg.temperature = PCMsg.motor_velocity;//tempSensor.gettemperature();
+  ArduinoMsg.temperature = tempSensor.gettemperature();
   ArduinoMsg.light_gate_state=lightGateSensor.getState();
-  ArduinoMsg.ultrasonic_distance = PCMsg.motor_angle;;//ultraSensor.pulse_width_measurement();
+  ArduinoMsg.ultrasonic_distance = ultraSensor.pulse_width_measurement();
   ArduinoMsg.ir_distance = irSensor.distanceReading();
   output_msg.publish(&ArduinoMsg);
 
@@ -205,13 +205,14 @@ void loop() {
       break;
   }
 
+ 
   //Motor velocit handling when no sensor checked
-  if((sensor_state == 0) && (M_VEL_ACT*PCMsg.motor_speed_checked)&&(current_state != 0)){
+  if((current_state != 0)&&PCMsg.motor_speed_checked&&(sensor_max == -1) && (sensor_min == -1)){
     //motor velocity control code goes here
     (*motorVelocityController).setVelocity(PCMsg.motor_velocity);
   }
 
-  if((sensor_state == 0) && (M_POS_ACT*PCMsg.motor_position_checked) && (current_state != 0)){
+  if((current_state != 0)&&PCMsg.motor_position_checked&&(sensor_max == -1) && (sensor_min == -1)){
     //motor angle control code goes here
     (*motorPositionController).setAngle(PCMsg.motor_angle);
   }
@@ -248,7 +249,10 @@ void loop() {
   }
   else{
     myServo.write(servo_angle);
-    (*motorVelocityController).setVelocity(0);
+    if((current_state==0))
+    {
+      (*motorVelocityController).setVelocity(0);
+    }
   }
 
 
