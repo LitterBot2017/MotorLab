@@ -43,8 +43,8 @@ void MotorPositionController::setAngle(int desired) {
   control = pControl + iControl + dControl;
 
   if ((millis() % 1000) == 0) {
-//    Serial.println("errorNow: " + String(errorNow) + "; errorDiff: " + String(errorDiff) + "; control = " + String(control));
-//    Serial.println("currentAngle: " + String(currentAngle) + "; desiredAngle: " + String(desiredAngle));
+    Serial.println("errorNow: " + String(errorNow) + "; errorDiff: " + String(errorDiff) + "; control = " + String(control));
+    Serial.println("currentAngle: " + String(currentAngle) + "; desiredAngle: " + String(desiredAngle));
   }
 
   timeLast = timeNow;

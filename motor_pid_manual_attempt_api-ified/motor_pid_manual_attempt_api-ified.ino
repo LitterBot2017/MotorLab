@@ -37,9 +37,9 @@ void loop() {
   }
   //Serial.println("currentAngle: " + String(motorPositionController.getAngle()));
 
-//  (*motorVelocityController).setVelocity(desired);
+  (*motorVelocityController).setVelocity(desired);
 
-  (*motorPositionController).setAngle(desired);
+  // (*motorPositionController).setAngle(desired);
 
 }
 
