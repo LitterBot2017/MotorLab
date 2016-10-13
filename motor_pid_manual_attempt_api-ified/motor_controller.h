@@ -11,12 +11,10 @@
 class MotorController {
 
   public:
-    MotorController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort);
+    MotorController(byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort);
     void turnMotor(int velocity);
 
   private:
-    byte mMotorEncoderAPort;
-    byte mMotorEncoderBPort;
     byte mMotorL1Port;
     byte mMotorL2Port;
     byte mMotorSpeedPort;

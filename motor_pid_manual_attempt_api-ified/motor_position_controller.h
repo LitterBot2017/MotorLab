@@ -30,7 +30,7 @@ class MotorPositionController {
     int errorNow;
     int errorLast;
     int errorDiff;
-    int errorSum;
+    long errorSum;
     
     int timeNow;
     int timeLast;
@@ -47,7 +47,7 @@ class MotorPositionController {
     byte mMotorL2Port;
     byte mMotorSpeedPort;
 
-    const double kp = 1, ki = 0, kd = 0;
+    const double kp = 5, ki = 0.001, kd = 0;
 };
 
 #endif

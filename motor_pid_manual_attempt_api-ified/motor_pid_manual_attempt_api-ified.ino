@@ -10,7 +10,7 @@ const byte motorSpeedPort = 11;
 
 int desiredAngle;
 
-MotorController motorController(motorEncoderAPort, motorEncoderBPort, motorL1Port, motorL2Port, motorSpeedPort);
+MotorController motorController(motorL1Port, motorL2Port, motorSpeedPort);
 MotorPositionController* motorPositionController;
 //MotorVelocityController* motorVelocityController;
 

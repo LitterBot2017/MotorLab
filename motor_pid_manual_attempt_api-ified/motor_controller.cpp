@@ -2,10 +2,8 @@
 #include "Arduino.h"
 #include <Encoder.h>
 
-MotorController::MotorController(byte pMotorEncoderAPort, byte pMotorEncoderBPort, byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort) {
+MotorController::MotorController(byte pMotorL1Port, byte pMotorL2Port, byte pMotorSpeedPort) {
 
-  mMotorEncoderAPort = pMotorEncoderAPort;
-  mMotorEncoderBPort = pMotorEncoderBPort;
   mMotorL1Port = pMotorL1Port;
   mMotorL2Port = pMotorL2Port;
   mMotorSpeedPort = pMotorSpeedPort;
@@ -14,10 +12,6 @@ MotorController::MotorController(byte pMotorEncoderAPort, byte pMotorEncoderBPor
   pinMode(mMotorL1Port, OUTPUT);
   pinMode(mMotorL2Port, OUTPUT);
   pinMode(mMotorSpeedPort, OUTPUT);
-
-  // Motor Encoder Pin Setup
-  pinMode(mMotorEncoderAPort, INPUT);
-  pinMode(mMotorEncoderBPort, INPUT);
 }
 
 void MotorController::turnMotor(int velocity) {
@@ -28,13 +22,13 @@ void MotorController::turnMotor(int velocity) {
     velocity = -255;
   }
 
-  if (velocity > 0 && velocity < 90) {
-    velocity = 90;
-  } else if (velocity < 0 && velocity > -90) {
-    velocity = -90;
-  }
+//  if (velocity > 0 && velocity < 90) {
+//    velocity = 90;
+//  } else if (velocity < 0 && velocity > -90) {
+//    velocity = -90;
+//  }
 
-  if (abs(velocity) > 0) {
+//  if (abs(velocity) > 0) {
     if (velocity < 0) {
       digitalWrite(mMotorL1Port, HIGH);
       digitalWrite(mMotorL2Port, LOW);
@@ -43,7 +37,7 @@ void MotorController::turnMotor(int velocity) {
       digitalWrite(mMotorL2Port, HIGH);
     }
     analogWrite(mMotorSpeedPort, abs(velocity));
-  }
+//  }
 }
 
 
