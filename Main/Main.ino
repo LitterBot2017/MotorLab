@@ -9,6 +9,9 @@
 #include "Thermistor.h"
 #include "StepperMotor.h"
 
+#include "motor_position_controller.h"
+#include "motor_velocity_controller.h"
+
 const int button0_pin = 2;
 int but0_old_state = LOW;
 int but0_new_state = LOW;
@@ -30,7 +33,20 @@ int current_state = 0;
 // Actuators
 Servo myServo;
 StepperMotor myStepper(10, 11);
-// TODO: Initialize DC Motor
+/******* Begin Motor Stuff **********/
+// Pins
+const byte motorEncoderAPort = 19;
+const byte motorEncoderBPort = 18;
+const byte motorL1Port = 6;
+const byte motorL2Port = 7;
+const byte motorSpeedPort = 12;
+
+MotorController motorController(motorL1Port, motorL2Port, motorSpeedPort);
+MotorPositionController* motorPositionController;
+MotorVelocityController* motorVelocityController;
+Encoder encoder(motorEncoderAPort, motorEncoderBPort);
+/******* End Motor Stuff **********/
+
 
 // Sensors
 Ultrasonic ultraSensor(4);
@@ -129,12 +145,16 @@ void setup() {
   myServo.attach(9);
   pinMode(button0_pin, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(button0_pin),button0_isr_change,CHANGE);
+
+    //Motor Stuff
+  motorPositionController = new MotorPositionController(&encoder, motorL1Port, motorL2Port, motorSpeedPort, &motorController);
+  motorVelocityController = new MotorVelocityController(&encoder, motorL1Port, motorL2Port, motorSpeedPort, &motorController);
 }
 
 void loop() {
   // package the output message
-  ArduinoMsg.dc_motor_position = 0;
-  ArduinoMsg.dc_motor_speed = 0;
+  ArduinoMsg.dc_motor_position = (*motorPositionController).getAngle();
+  ArduinoMsg.dc_motor_speed = (*motorVelocityController).getVeloctiyRPM();
   ArduinoMsg.servo_position = servo_angle;
   ArduinoMsg.stepper_motor_position = 0;
   ArduinoMsg.temperature = tempSensor.gettemperature();
@@ -174,8 +194,8 @@ void loop() {
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
       break;
     case ULTRA_SENSE:
-      sensor_min = 1000;
-      sensor_max = 2500;
+      sensor_min = 850;
+      sensor_max = 5000;
       sensor_reading = ArduinoMsg.ultrasonic_distance;
       sensor_reading = constrain(sensor_reading, sensor_min, sensor_max);
     default:
@@ -199,16 +219,16 @@ void loop() {
     actuator_state = M_POS_ACT*PCMsg.motor_position_checked + M_VEL_ACT*PCMsg.motor_speed_checked + SERVO_ACT*PCMsg.servo_checked;
     switch(actuator_state){
       case M_POS_ACT:
-        actuator_min = 0;
-        actuator_max = 360;
+        actuator_min = 60;
+        actuator_max = 300;
         actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
-        // TODO: call motor command
+        (*motorPositionController).setAngle(actuator_effort);
         break;
       case M_VEL_ACT:
         actuator_min = -70;
         actuator_max = 70;
         actuator_effort = map(sensor_reading, sensor_min, sensor_max, actuator_min, actuator_max);
-        // TODO: call motor command
+        (*motorVelocityController).setVelocity(actuator_effort);
         break;
       case SERVO_ACT:
         actuator_min = 0;
@@ -219,13 +239,13 @@ void loop() {
         break;
       default:
         myServo.write(servo_angle);
-        // TODO: Write motor velocity zero
+        (*motorVelocityController).setVelocity(0);
         break;
     }
   }
   else{
     myServo.write(servo_angle);
-    // TODO: Write motor velocity zero
+    (*motorVelocityController).setVelocity(0);
   }
 
 
